@@ -12,12 +12,16 @@ import {
   Table,
 } from "antd";
 import Input from "antd/es/input/Input";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 function Signup(props) {
   const [form] = Form.useForm();
   const [step, setStep] = useState(1);
   const [ischecked, setIsChecked] = useState(false);
+
+  const handleSignup = () => {
+    console.log(form.getFieldsValue());
+  };
 
   return (
     <div
@@ -30,7 +34,12 @@ function Signup(props) {
     >
       {step === 1 && <Step1 setIsChecked={setIsChecked} />}
       {step === 2 && <Step2 form={form} />}
-      <PrimaryButton step={step} setStep={setStep} ischecked={ischecked} />
+      <PrimaryButton
+        step={step}
+        setStep={setStep}
+        ischecked={ischecked}
+        onFinish={handleSignup}
+      />
     </div>
   );
 }
@@ -156,18 +165,34 @@ const Step1 = (props) => {
 const Step2 = (props) => {
   const { form } = props;
   const [selectedAccountType, setSelectedAccountType] = useState("");
-  const [selectedType, setSelectedType] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
-  const [modalStep, setModalStep] = useState(1);
+
   const onSearch = () => {
     setModalOpen(true);
   };
 
-  const handleSelceted = () => {
+  const onOK = () => {
     setModalOpen(false);
   };
+
+  const handleAccountTypeChange = (type) => {
+    setSelectedAccountType(type);
+    form.setFieldsValue({
+      type,
+      name: null,
+      organization_name: null,
+      email: null,
+      password: null,
+      confirm_password: null,
+    });
+  };
+
   return (
-    <Form form={form} requiredMark={false}>
+    <Form
+      style={{ display: "flex", flexDirection: "column", gap: "10px" }}
+      form={form}
+      requiredMark={false}
+    >
       <Form.Item
         style={{ margin: "0" }}
         name={"type"}
@@ -187,23 +212,21 @@ const Step2 = (props) => {
                 padding: "12px 24px",
                 backgroundColor:
                   selectedAccountType === "person" ? "#A1E3F9" : "#F1F1F1",
-                width: "100%", // 너비 조절
+                width: "100%",
               }}
-              onClick={() => setSelectedAccountType("person")}
+              onClick={() => handleAccountTypeChange("person")}
             >
-              <div
-                style={{
-                  width: "64px",
-                  height: "64px",
-                  backgroundColor: "black",
-                }}
+              <Image
+                preview={false}
+                src="/images/signup1.png"
+                alt="Logo"
+                height={64}
               />
               <div>개인 회원</div>
             </div>
           </Col>
           <Col span={12} style={{ padding: "0 8px" }}>
             <div
-              onClick={() => setSelectedAccountType("organization")}
               style={{
                 display: "flex",
                 flexDirection: "column",
@@ -216,15 +239,15 @@ const Step2 = (props) => {
                   selectedAccountType === "organization"
                     ? "#A1E3F9"
                     : "#F1F1F1",
-                width: "100%", // 너비 조절
+                width: "100%",
               }}
+              onClick={() => handleAccountTypeChange("organization")}
             >
-              <div
-                style={{
-                  width: "64px",
-                  height: "64px",
-                  backgroundColor: "black",
-                }}
+              <Image
+                preview={false}
+                src="/images/signup2.png"
+                alt="Logo"
+                height={64}
               />
               <div>기관 회원</div>
             </div>
@@ -285,114 +308,128 @@ const Step2 = (props) => {
         <Input placeholder="비밀번호를 확인해주세요." size="large" />
       </Form.Item>
 
-      <Modal
+      <SearchModal
         open={modalOpen}
         onCancel={() => setModalOpen(false)}
-        title={
-          modalStep === 1
-            ? "기관유형을 선택해주세요."
-            : `${
-                selectedType === "hospital" ? "요양병원" : "요양원"
-              }을 검색해주세요.`
-        }
-        footer={
-          <Space style={{ width: "100%", justifyContent: "center" }}>
-            {modalStep === 1 ? (
-              <Button
-                size="large"
-                type="primary"
-                onClick={() => setModalStep(2)}
-              >
-                기관 검색하기
-              </Button>
-            ) : (
-              <>
-                <Button size="large" onClick={() => setModalOpen(false)}>
-                  취소
-                </Button>
-                <Button size="large" onClick={handleSelceted}>
-                  확인
-                </Button>
-              </>
-            )}
-          </Space>
-        }
-      >
-        {modalStep === 1 ? (
-          <Row gutter={[16, 16]} style={{ width: "100%" }}>
-            <Col span={12} style={{ padding: "0 8px" }}>
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  gap: "3px",
-                  borderRadius: "10px",
-                  padding: "12px 24px",
-                  backgroundColor:
-                    selectedType === "hospital" ? "#A1E3F9" : "#F1F1F1",
-                  width: "100%", // 너비 조절
-                }}
-                onClick={() => setSelectedType("hospital")}
-              >
-                <div
-                  style={{
-                    width: "64px",
-                    height: "64px",
-                    backgroundColor: "black",
-                  }}
-                />
-                <div>요양병원</div>
-              </div>
-            </Col>
-            <Col span={12} style={{ padding: "0 8px" }}>
-              <div
-                onClick={() => setSelectedType("care")}
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  gap: "3px",
-                  borderRadius: "10px",
-                  padding: "12px 24px",
-                  backgroundColor:
-                    selectedType === "care" ? "#A1E3F9" : "#F1F1F1",
-                  width: "100%", // 너비 조절
-                }}
-              >
-                <div
-                  style={{
-                    width: "64px",
-                    height: "64px",
-                    backgroundColor: "black",
-                  }}
-                />
-                <div>요양원</div>
-              </div>
-            </Col>
-          </Row>
-        ) : (
-          <Space direction="vertical" style={{ width: "100%" }}>
-            <Flex style={{ width: "100%", gap: "8px" }}>
-              <Input
-                placeholder="기관명을 입력해주세요."
-                type="text"
-                size="large"
-              />
-              <Button size="large" icon={<SearchOutlined />} />
-            </Flex>
-            <Table />
-          </Space>
-        )}
-      </Modal>
+        onOK={onOK}
+      />
     </Form>
   );
 };
 
+const SearchModal = (props) => {
+  const { open, onCancel, onOK } = props;
+
+  useEffect(() => {
+    if (open) {
+      setModalStep(1);
+    }
+  }, [open]);
+
+  const [modalStep, setModalStep] = useState(1);
+  const [selectedType, setSelectedType] = useState("");
+  return (
+    <Modal
+      open={open}
+      onCancel={onCancel}
+      title={
+        modalStep === 1
+          ? "기관유형을 선택해주세요."
+          : `${
+              selectedType === "hospital" ? "요양병원" : "요양원"
+            }을 검색해주세요.`
+      }
+      footer={
+        <Space style={{ width: "100%", justifyContent: "center" }}>
+          {modalStep === 1 ? (
+            <Button size="large" type="primary" onClick={() => setModalStep(2)}>
+              기관 검색하기
+            </Button>
+          ) : (
+            <>
+              <Button size="large" onClick={onCancel}>
+                취소
+              </Button>
+              <Button size="large" onClick={onOK}>
+                확인
+              </Button>
+            </>
+          )}
+        </Space>
+      }
+    >
+      {modalStep === 1 ? (
+        <Row gutter={[16, 16]} style={{ width: "100%" }}>
+          <Col span={12} style={{ padding: "0 8px" }}>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center",
+                gap: "3px",
+                borderRadius: "10px",
+                padding: "12px 24px",
+                backgroundColor:
+                  selectedType === "hospital" ? "#A1E3F9" : "#F1F1F1",
+                width: "100%", // 너비 조절
+              }}
+              onClick={() => setSelectedType("hospital")}
+            >
+              <Image
+                preview={false}
+                src="/images/signup3.png"
+                alt="Logo"
+                height={64}
+              />
+              <div>요양병원</div>
+            </div>
+          </Col>
+          <Col span={12} style={{ padding: "0 8px" }}>
+            <div
+              onClick={() => setSelectedType("care")}
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center",
+                gap: "3px",
+                borderRadius: "10px",
+                padding: "12px 24px",
+                backgroundColor:
+                  selectedType === "care" ? "#A1E3F9" : "#F1F1F1",
+                width: "100%", // 너비 조절
+              }}
+            >
+              <Image
+                preview={false}
+                src="/images/signup4.png"
+                alt="Logo"
+                height={64}
+              />
+              <div>요양원</div>
+            </div>
+          </Col>
+        </Row>
+      ) : (
+        <Space direction="vertical" style={{ width: "100%" }}>
+          <Flex style={{ width: "100%", gap: "8px" }}>
+            <Input
+              placeholder="기관명을 입력해주세요."
+              type="text"
+              size="large"
+            />
+            <Button size="large" icon={<SearchOutlined />} />
+          </Flex>
+          <Table />
+        </Space>
+      )}
+    </Modal>
+  );
+};
+
 const PrimaryButton = (props) => {
-  const { step, ischecked, setStep } = props;
+  const { step, ischecked, setStep, onFinish } = props;
   return (
     <>
       {step === 1 && (
@@ -406,7 +443,7 @@ const PrimaryButton = (props) => {
         </Button>
       )}
       {step === 2 && (
-        <Button type="primary" size="large">
+        <Button type="primary" size="large" onClick={onFinish}>
           회원가입
         </Button>
       )}
