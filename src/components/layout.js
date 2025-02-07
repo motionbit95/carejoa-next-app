@@ -6,9 +6,7 @@ const { Header, Content, Footer } = Layout;
 
 const AppLayout = ({ children, ...props }) => (
   <Layout style={{ minHeight: "100vh" }}>
-    <Header
-      style={{ position: "fixed", zIndex: 1, width: "100%", paddingInline: 16 }}
-    >
+    <Header style={{ zIndex: 1, width: "100%", paddingInline: 16 }}>
       <ArrowLeftOutlined />
       <Typography.Title level={3}></Typography.Title>
     </Header>
