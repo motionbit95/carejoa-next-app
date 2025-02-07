@@ -12,7 +12,7 @@ const AppLayout = ({
   hasFooter = false,
   title,
 }) => (
-  <Layout style={{ minHeight: "100vh" }}>
+  <Layout style={{ minHeight: "100vh", maxWidth: "480px", margin: "0 auto" }}>
     {hasHeader && (
       <Header
         style={{
@@ -40,6 +40,23 @@ const AppLayout = ({
       </Footer>
     )}
   </Layout>
+);
+
+export const Center = ({ children }) => (
+  <div
+    style={{
+      position: "fixed",
+      top: 0,
+      left: 0,
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      height: "100%",
+      width: "100%",
+    }}
+  >
+    {children}
+  </div>
 );
 
 // PropTypes 설정
